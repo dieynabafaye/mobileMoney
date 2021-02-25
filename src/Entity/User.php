@@ -3,11 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ *  @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="type_id", type="integer")
+ * @ORM\DiscriminatorMap({1 ="AdminSystem",2="Caissier",3="AdminAgence",4="UserAgence", 5="User"})
+ *
  */
 class User implements UserInterface
 {
@@ -23,10 +29,8 @@ class User implements UserInterface
      */
     private $username;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
+
+    private $roles;
 
     /**
      * @var string The hashed password
@@ -69,6 +73,17 @@ class User implements UserInterface
      */
     private $avatar;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="users")
+     */
+    private $agence;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Profil::class, inversedBy="users")
+     */
+    private $profil;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -98,7 +113,7 @@ class User implements UserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $roles[] = 'ROLE_'.$this->profil->getLibelle();
 
         return array_unique($roles);
     }
@@ -228,4 +243,30 @@ class User implements UserInterface
 
         return $this;
     }
+
+    public function getAgence(): ?Agence
+    {
+        return $this->agence;
+    }
+
+    public function setAgence(?Agence $agence): self
+    {
+        $this->agence = $agence;
+
+        return $this;
+    }
+
+
+    public function getProfil(): ?Profil
+    {
+        return $this->profil;
+    }
+
+    public function setProfil(?Profil $profil): self
+    {
+        $this->profil = $profil;
+
+        return $this;
+    }
+
 }
