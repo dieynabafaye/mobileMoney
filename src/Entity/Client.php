@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=ClientRepository::class)
+ * @ApiResource ()
  */
 class Client
 {
@@ -39,10 +41,21 @@ class Client
      */
     private $transaction;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Transaction::class, mappedBy="clientEnvoi")
+     */
+    private $transactions;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $status;
+
 
     public function __construct()
     {
         $this->transaction = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -106,6 +119,26 @@ class Client
     public function removeTransaction(Transaction $transaction): self
     {
         $this->transaction->removeElement($transaction);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function getStatus(): ?bool
+    {
+        return $this->status;
+    }
+
+    public function setStatus(bool $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

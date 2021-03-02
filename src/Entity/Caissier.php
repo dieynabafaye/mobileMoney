@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CaissierRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,16 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=CaissierRepository::class)
+ * @ApiResource(
+ *     collectionOperations={
+*           "get"= {
+ *     "methods" = "GET",
+         *          "path" = "/caissiers",
+         *          "normalization_context"={"groups"={"caissiers:read"}},
+         *     }
+ *     }
+ *
+ * )
  */
 class Caissier extends User
 {

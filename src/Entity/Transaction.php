@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\TransactionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,15 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TransactionRepository::class)
+ * @ApiResource (
+ *     collectionOperations={
+            "get", "addTransaction" = { "path" = "/transactions", "method" = "POST", "route_name" = "post_transaction"}
+ *     },
+ *
+ *     itemOperations={
+            "get", "put", "deleteTransaction" = { "path" = "/transactions/delete", "method" = "DELETE", "route_name" = "delete_transaction"}
+ *     }
+ * )
  */
 class Transaction
 {
@@ -17,12 +27,12 @@ class Transaction
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      */
-    private $montant;
+    private ?int $montant;
 
     /**
      * @ORM\Column(type="date")
@@ -30,71 +40,82 @@ class Transaction
     private $dateDepot;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
-    private $dateRetrait;
+    private ?\DateTimeInterface $dateRetrait;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
-    private $dateAnnulation;
+    private ?\DateTimeInterface $dateAnnulation;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      */
     private $TTC;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      */
-    private $fraisEtat;
+    private  ?int $fraisEtat;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      */
-    private $fraisSystem;
+    private ?int $fraisSystem;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      */
-    private $fraisEnvoie;
+    private ?int $fraisEnvoie;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      */
-    private $fraisRetrait;
+    private ?int $fraisRetrait;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      */
-    private $codeTransaction;
+    private ?int $codeTransaction;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transaction")
+     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="transaction")
      */
-    private $compte;
+    private ?Compte $compte;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Client::class, mappedBy="transaction")
-     */
-    private $clients;
+
 
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="boolean")
      */
-    private $type;
+    private ?bool $status;
 
     /**
-     * @ORM\ManyToMany(targetEntity=UserAgence::class, mappedBy="transaction")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactions")
      */
-    private $userAgences;
+    private ?User $userDepot;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactions")
+     */
+    private $userRetrait;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="transactions")
+     */
+    private $clientEnvoi;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="transactions")
+     */
+    private $clientRetrait;
+
+
 
     public function __construct()
     {
-        $this->clients = new ArrayCollection();
-        $this->users = new ArrayCollection();
-        $this->userAgences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -102,12 +123,12 @@ class Transaction
         return $this->id;
     }
 
-    public function getMontant(): ?string
+    public function getMontant(): ?int
     {
         return $this->montant;
     }
 
-    public function setMontant(string $montant): self
+    public function setMontant(int $montant): self
     {
         $this->montant = $montant;
 
@@ -150,60 +171,60 @@ class Transaction
         return $this;
     }
 
-    public function getTTC(): ?string
+    public function getTTC(): ?int
     {
         return $this->TTC;
     }
 
-    public function setTTC(string $TTC): self
+    public function setTTC(int $TTC): self
     {
         $this->TTC = $TTC;
 
         return $this;
     }
 
-    public function getFraisEtat(): ?string
+    public function getFraisEtat(): ?int
     {
         return $this->fraisEtat;
     }
 
-    public function setFraisEtat(string $fraisEtat): self
+    public function setFraisEtat(int $fraisEtat): self
     {
         $this->fraisEtat = $fraisEtat;
 
         return $this;
     }
 
-    public function getFraisSystem(): ?string
+    public function getFraisSystem(): ?int
     {
         return $this->fraisSystem;
     }
 
-    public function setFraisSystem(string $fraisSystem): self
+    public function setFraisSystem(int $fraisSystem): self
     {
         $this->fraisSystem = $fraisSystem;
 
         return $this;
     }
 
-    public function getFraisEnvoie(): ?string
+    public function getFraisEnvoie(): ?int
     {
         return $this->fraisEnvoie;
     }
 
-    public function setFraisEnvoie(string $fraisEnvoie): self
+    public function setFraisEnvoie(int $fraisEnvoie): self
     {
         $this->fraisEnvoie = $fraisEnvoie;
 
         return $this;
     }
 
-    public function getFraisRetrait(): ?string
+    public function getFraisRetrait(): ?int
     {
         return $this->fraisRetrait;
     }
 
-    public function setFraisRetrait(string $fraisRetrait): self
+    public function setFraisRetrait(int $fraisRetrait): self
     {
         $this->fraisRetrait = $fraisRetrait;
 
@@ -234,69 +255,67 @@ class Transaction
         return $this;
     }
 
-    /**
-     * @return Collection|Client[]
-     */
-    public function getClients(): Collection
+
+    public function getStatus(): ?bool
     {
-        return $this->clients;
+        return $this->status;
     }
 
-    public function addClient(Client $client): self
+    public function setStatus(bool $status): self
     {
-        if (!$this->clients->contains($client)) {
-            $this->clients[] = $client;
-            $client->addTransaction($this);
-        }
+        $this->status = $status;
 
         return $this;
     }
 
-    public function removeClient(Client $client): self
+    public function getUserDepot(): ?User
     {
-        if ($this->clients->removeElement($client)) {
-            $client->removeTransaction($this);
-        }
+        return $this->userDepot;
+    }
+
+    public function setUserDepot(?User $userDepot): self
+    {
+        $this->userDepot = $userDepot;
 
         return $this;
     }
 
-    public function getType(): ?string
+    public function getUserRetrait(): ?User
     {
-        return $this->type;
+        return $this->userRetrait;
     }
 
-    public function setType(string $type): self
+    public function setUserRetrait(?User $userRetrait): self
     {
-        $this->type = $type;
+        $this->userRetrait = $userRetrait;
 
         return $this;
     }
 
-    /**
-     * @return Collection|UserAgence[]
-     */
-    public function getUserAgences(): Collection
+    public function getClientEnvoi(): ?Client
     {
-        return $this->userAgences;
+        return $this->clientEnvoi;
     }
 
-    public function addUserAgence(UserAgence $userAgence): self
+    public function setClientEnvoi(?Client $clientEnvoi): self
     {
-        if (!$this->userAgences->contains($userAgence)) {
-            $this->userAgences[] = $userAgence;
-            $userAgence->addTransaction($this);
-        }
+        $this->clientEnvoi = $clientEnvoi;
 
         return $this;
     }
 
-    public function removeUserAgence(UserAgence $userAgence): self
+    public function getClientRetrait(): ?Client
     {
-        if ($this->userAgences->removeElement($userAgence)) {
-            $userAgence->removeTransaction($this);
-        }
+        return $this->clientRetrait;
+    }
+
+    public function setClientRetrait(?Client $clientRetrait): self
+    {
+        $this->clientRetrait = $clientRetrait;
 
         return $this;
     }
+
+
+
 }

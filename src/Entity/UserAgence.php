@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserAgenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=UserAgenceRepository::class)
+ * @ApiResource ()
  */
 class UserAgence extends User
 {
@@ -16,6 +18,11 @@ class UserAgence extends User
      * @ORM\ManyToMany(targetEntity=Transaction::class, inversedBy="userAgences")
      */
     private $transaction;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="userAgence")
+     */
+    private $agence;
 
     public function __construct()
     {
@@ -42,6 +49,18 @@ class UserAgence extends User
     public function removeTransaction(Transaction $transaction): self
     {
         $this->transaction->removeElement($transaction);
+
+        return $this;
+    }
+
+    public function getAgence(): ?Agence
+    {
+        return $this->agence;
+    }
+
+    public function setAgence(?Agence $agence): self
+    {
+        $this->agence = $agence;
 
         return $this;
     }

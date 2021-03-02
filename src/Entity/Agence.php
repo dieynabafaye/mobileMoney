@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\AgenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,15 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=AgenceRepository::class)
+ * @ApiResource (
+ *     collectionOperations={
+            "get", "addAgence"={"method":"post","path":"/agences","route_name"="addingAgence"}
+ *     },
+ *
+ *     itemOperations={
+            "get", "put", "delete"
+ *     }
+ * )
  */
 class Agence
 {
@@ -30,23 +40,24 @@ class Agence
     private $adresse;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="boolean")
      */
-    private $status;
-
-    /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="agence")
-     */
-    private $users;
+    private $status=false;
 
     /**
      * @ORM\OneToOne(targetEntity=Compte::class, cascade={"persist", "remove"})
      */
     private $compte;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserAgence::class, mappedBy="agence")
+     */
+    private $userAgence;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->userAgence = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,24 +101,6 @@ class Agence
         return $this;
     }
 
-    /**
-     * @return Collection|User[]
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(User $user): self
-    {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->setAgence($this);
-        }
-
-        return $this;
-    }
-
     public function removeUser(User $user): self
     {
         if ($this->users->removeElement($user)) {
@@ -128,6 +121,36 @@ class Agence
     public function setCompte(?Compte $compte): self
     {
         $this->compte = $compte;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserAgence[]
+     */
+    public function getUserAgence(): Collection
+    {
+        return $this->userAgence;
+    }
+
+    public function addUserAgence(UserAgence $userAgence): self
+    {
+        if (!$this->userAgence->contains($userAgence)) {
+            $this->userAgence[] = $userAgence;
+            $userAgence->setAgence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAgence(UserAgence $userAgence): self
+    {
+        if ($this->userAgence->removeElement($userAgence)) {
+            // set the owning side to null (unless already changed)
+            if ($userAgence->getAgence() === $this) {
+                $userAgence->setAgence(null);
+            }
+        }
 
         return $this;
     }

@@ -1,3 +1,24 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+api_login_check:
+  path: /api/login_check
+  methods: ['POST']
+
+addingAgence:
+  path: /api/agences
+  controller: App\Controller\AgenceController::AddAgence
+
+post_transaction:
+  path: /api/transactions
+  controller: App\Controller\TransactionController::addTransaction
+delete_transaction:
+  path: /api/transactions/delete
+  controller: App\Controller\TransactionController::DeleteTransaction
+addDepot:
+  path: /api/depots
+  controller: App\Controller\DepotController::ADDdepot
+deleteDepot:
+  path: /api/depots/{id}
+  controller: App\Controller\DepotController::Deletedepot
+
