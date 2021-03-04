@@ -5,13 +5,32 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\DepotRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=DepotRepository::class)
+ * normalizationContext={"groups"={"depots:read"}},
+ * attributes={
+ *          "security"="is_granted ('ROLE_AdminSystem') or is_granted ('ROLE_Caissier')",
+ *          "security_message"="Vous n'avez pas access à cette Ressource"
+ *     },
  * @ApiResource(
- *     itemOperations={"GET","PUT","deleteDepot"={"method":"DELETE","path": "/depots/{id}","route_name":"deleteDepot"}},
- *     collectionOperations={"GET",
- *     "addDepot"={"method":"POST","path": "/depots","route_name":"addDepot"}
+ *     itemOperations={
+ *        "GET"= {"path"= "/admin/depots/{id}"},
+ *         "PUT"= {"path"= "/admin/depots/{id}"},
+ *         "deleteDepot"={
+ *              "method":"DELETE",
+ *              "path": "/admin/depots/{id}",
+ *              "route_name":"deleteDepot"
+ *          }
+ *     },
+ *     collectionOperations={
+ *          "GET" = {"path"= "/admin/depots"},
+ *          "addDepot"={
+ *          "method":"POST",
+ *          "path": "/admin/depots",
+ *          "route_name":"addDepot"
+ *     }
  *     }
  * )
  */
@@ -21,6 +40,7 @@ class Depot
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups ({"depots:read"})
      */
     private ?int $id;
 
@@ -31,16 +51,19 @@ class Depot
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups ({"depots:read", "transactions:read"})
      */
     private ?int $montant;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="depots")
+     * @Groups ({"depots:read"})
      */
     private ?User $user;
 
     /**
      * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="depots")
+     * @Groups ({"depots:read"})
      */
     private ?Compte $compte;
 

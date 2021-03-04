@@ -56,7 +56,7 @@ class User implements UserInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups ({"users:read", "caissiers:read"})
-     * @Groups ({"comptes:write", "compts:read"})
+     * @Groups ({"comptes:write", "compts:read", "transactions:read", "depots:read"})
      */
     private $id;
 
@@ -80,35 +80,35 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank (message="le nom est obligatoire")
-     * @Groups ({"users:read", "caissiers:read", "comptes:write", "compts:read"})
+     * @Groups ({"users:read", "caissiers:read", "comptes:write", "compts:read", "transactions:read", "depots:read"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank (message="le prenom est obligatoire")
-     * @Groups ({"users:read", "comptes:write", "compts:read"})
+     * @Groups ({"users:read", "comptes:write", "compts:read", "caissiers:read", "transactions:read", "depots:read"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank (message="le numéro de téléphone est obligatoire")
-     * @Groups ({"users:read", "comptes:write", "compts:read"})
+     * @Groups ({"users:read", "comptes:write", "compts:read", "caissiers:read", "depots:read"})
      */
     private $tel;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank (message="CNI obligatoire")
-     * @Groups ({"users:read", "comptes:write", "compts:read"})
+     * @Groups ({"users:read", "comptes:write", "compts:read", "caissiers:read"})
      */
     private $CNI;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank (message="l'adresse est obligatoire")
-     * @Groups ({"users:read", "comptes:write", "compts:read"})
+     * @Groups ({"users:read", "comptes:write", "compts:read", "caissiers:read", "transactions:read"})
      */
     private $adresse;
 
@@ -137,6 +137,11 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity=Depot::class, mappedBy="user")
      */
     private $depots;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="users")
+     */
+    private $agence;
 
     public function __construct()
     {
@@ -373,6 +378,18 @@ class User implements UserInterface
                 $depot->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAgence(): ?Agence
+    {
+        return $this->agence;
+    }
+
+    public function setAgence(?Agence $agence): self
+    {
+        $this->agence = $agence;
 
         return $this;
     }

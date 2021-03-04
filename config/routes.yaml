@@ -6,19 +6,19 @@ api_login_check:
   methods: ['POST']
 
 addingAgence:
-  path: /api/agences
+  path: /api/admin/agences
   controller: App\Controller\AgenceController::AddAgence
 
 post_transaction:
-  path: /api/transactions
+  path: /api/admin/transactions
   controller: App\Controller\TransactionController::addTransaction
 delete_transaction:
-  path: /api/transactions/delete
+  path: /api/admin/transactions/delete
   controller: App\Controller\TransactionController::DeleteTransaction
 addDepot:
-  path: /api/depots
+  path: /api/admin/depots
   controller: App\Controller\DepotController::ADDdepot
 deleteDepot:
-  path: /api/depots/{id}
+  path: /api/admin/depots/{id}
   controller: App\Controller\DepotController::Deletedepot
 

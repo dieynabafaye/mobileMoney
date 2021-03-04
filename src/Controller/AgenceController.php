@@ -10,6 +10,7 @@ use App\Repository\UserAgenceRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -83,14 +84,15 @@ class AgenceController extends AbstractController
             foreach ($req['userAgences'] as $user)
             {
                if ( $agent = $this->userAgence->find($user['id'])){
-                   $agence->addUserAgence($agent);
+                   $agence->addUser($agent);
                }
 
             }
         }
         $this->manager->persist($agence);
         $this->manager->flush();
-        dd($agence);
+
+        return new JsonResponse(" Agence crée  avec succés", 200, [], true);
 
     }
 }

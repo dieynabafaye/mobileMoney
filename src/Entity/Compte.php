@@ -39,19 +39,19 @@ class Compte
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups ({"comptes:write", "compts:read"})
+     * @Groups ({"comptes:write", "compts:read", "agences:read", "transactions:read", "depots:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups ({"comptes:write", "compts:read"})
+     * @Groups ({"comptes:write", "compts:read", "agences:read", "transactions:read", "depots:read"})
      */
     private $numCompte;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups ({"comptes:write", "compts:read"})
+     * @Groups ({"comptes:write", "compts:read", "agences:read", "transactions:read", "depots:read"})
      */
     private $solde;
 

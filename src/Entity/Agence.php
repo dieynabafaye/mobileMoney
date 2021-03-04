@@ -7,16 +7,34 @@ use App\Repository\AgenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=AgenceRepository::class)
  * @ApiResource (
+ *      normalizationContext={"groups"={"agences:read"}},
+ *     attributes={
+ *          "security"="is_granted ('ROLE_AdminSystem') or is_granted ('ROLE_AdminAgence') or is_granted ('ROLE_Caissier') or is_granted ('ROLE_UserAgence')",
+ *          "security_message"="Vous n'avez pas access à cette Ressource"
+ *     },
+ *
  *     collectionOperations={
-            "get", "addAgence"={"method":"post","path":"/agences","route_name"="addingAgence"}
+ *       "get" = {"path"= "/admin/agences/comptes"},
+ *
+ *          "addAgence"={
+ *          "method":"post",
+ *          "path":"/admin/agences",
+ *           "route_name"="addingAgence",
+ *            "security"="is_granted('ROLE_AdminSystem') or is_granted('ROLE_AdminAgence')",
+ *            "security_message"="Vous n'avez pas access à cette Ressource"
+ *     }
+ *
  *     },
  *
  *     itemOperations={
-            "get", "put", "delete"
+            "get"= {"path"="/admin/agences/{id}"},
+ *     "put" = {"path"="/admin/agences/{id}"},
+ *     "delete" = {"path"="/admin/agences/{id}"}
  *     }
  * )
  */
@@ -26,16 +44,19 @@ class Agence
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups ({"agences:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups ({"agences:read"})
      */
     private $nomAgence;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups ({"agences:read"})
      */
     private $adresse;
 
@@ -46,18 +67,19 @@ class Agence
 
     /**
      * @ORM\OneToOne(targetEntity=Compte::class, cascade={"persist", "remove"})
+     * @Groups ({"agences:read"})
      */
     private $compte;
 
     /**
-     * @ORM\OneToMany(targetEntity=UserAgence::class, mappedBy="agence")
+     * @ORM\OneToMany(targetEntity=User::class, mappedBy="agence")
+     *
      */
-    private $userAgence;
+    private $users;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
-        $this->userAgence = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -101,18 +123,6 @@ class Agence
         return $this;
     }
 
-    public function removeUser(User $user): self
-    {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getAgence() === $this) {
-                $user->setAgence(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getCompte(): ?Compte
     {
         return $this->compte;
@@ -126,32 +136,33 @@ class Agence
     }
 
     /**
-     * @return Collection|UserAgence[]
+     * @return Collection|User[]
      */
-    public function getUserAgence(): Collection
+    public function getUsers(): Collection
     {
-        return $this->userAgence;
+        return $this->users;
     }
 
-    public function addUserAgence(UserAgence $userAgence): self
+    public function addUser(User $user): self
     {
-        if (!$this->userAgence->contains($userAgence)) {
-            $this->userAgence[] = $userAgence;
-            $userAgence->setAgence($this);
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setAgence($this);
         }
 
         return $this;
     }
 
-    public function removeUserAgence(UserAgence $userAgence): self
+    public function removeUser(User $user): self
     {
-        if ($this->userAgence->removeElement($userAgence)) {
+        if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
-            if ($userAgence->getAgence() === $this) {
-                $userAgence->setAgence(null);
+            if ($user->getAgence() === $this) {
+                $user->setAgence(null);
             }
         }
 
         return $this;
     }
+
 }

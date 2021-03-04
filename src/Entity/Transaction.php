@@ -7,16 +7,33 @@ use App\Repository\TransactionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=TransactionRepository::class)
  * @ApiResource (
+ *      normalizationContext={"groups"={"transactions:read"}},
+ *     attributes={
+ *          "security"="is_granted ('ROLE_AdminSystem') or is_granted ('ROLE_AdminAgence') or is_granted ('ROLE_Caissier') or is_granted ('ROLE_UserAgence')",
+ *          "security_message"="Vous n'avez pas access à cette Ressource"
+ *     },
  *     collectionOperations={
-            "get", "addTransaction" = { "path" = "/transactions", "method" = "POST", "route_name" = "post_transaction"}
+            "get"= {"path"= "/admin/transactions"},
+ *          "addTransaction" = {
+ *               "path" = "/admin/transactions",
+ *              "method" = "POST",
+ *              "route_name" = "post_transaction"
+ *      }
  *     },
  *
  *     itemOperations={
-            "get", "put", "deleteTransaction" = { "path" = "/transactions/delete", "method" = "DELETE", "route_name" = "delete_transaction"}
+            "get"= {"path"= "/admin/transactions/{id}"},
+ *          "put"= {"path"= "/admin/transactions/{id}"},
+ *          "deleteTransaction" = {
+ *              "path" = "/admin/transactions/delete",
+ *              "method" = "DELETE",
+ *              "route_name" = "delete_transaction"
+ *          }
  *     }
  * )
  */
@@ -26,16 +43,19 @@ class Transaction
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups ({"transactions:read"})
      */
     private ?int $id;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups ({"transactions:read"})
      */
     private ?int $montant;
 
     /**
      * @ORM\Column(type="date")
+     * @Groups ({"transactions:read"})
      */
     private $dateDepot;
 
@@ -51,36 +71,43 @@ class Transaction
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups ({"transactions:read"})
      */
     private $TTC;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups ({"transactions:read"})
      */
     private  ?int $fraisEtat;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups ({"transactions:read"})
      */
     private ?int $fraisSystem;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups ({"transactions:read"})
      */
     private ?int $fraisEnvoie;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups ({"transactions:read"})
      */
     private ?int $fraisRetrait;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups ({"transactions:read"})
      */
     private ?int $codeTransaction;
 
     /**
      * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="transaction")
+     * @Groups ({"transactions:read"})
      */
     private ?Compte $compte;
 
@@ -94,21 +121,25 @@ class Transaction
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactions")
+     * @Groups ({"transactions:read"})
      */
     private ?User $userDepot;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="transactions")
+     * @Groups ({"transactions:read"})
      */
     private $userRetrait;
 
     /**
      * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="transactions")
+     * @Groups ({"transactions:read"})
      */
     private $clientEnvoi;
 
     /**
      * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="transactions")
+     * @Groups ({"transactions:read"})
      */
     private $clientRetrait;
 
